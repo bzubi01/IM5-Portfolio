@@ -3,45 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfolio</title>
+  <title>benizubi – Portfolio</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/main.js" defer></script>
+  <script src="js/hero-canvas.js" defer></script>
 </head>
 <body>
-  <header>
-    <!-- Die schmale Darstellung der Navbar folgt mit der Gestaltung. -->
+  <a class="skip-link" href="#projekte">Zu den Projekten</a>
+  <header class="site-header">
+    <a class="wordmark" href="#start" aria-label="benizubi – Start">benizubi<span aria-hidden="true">/</span></a>
     <nav aria-label="Hauptnavigation">
       <ul>
-        <li><a href="#start">Start</a></li>
-        <li><a href="#projekte">Projekte</a></li>
-        <li><a href="#ueber-mich">Über mich</a></li>
-        <li><a href="#kontakt">Kontakt</a></li>
+        <li><a href="#start"><span class="nav-index" aria-hidden="true">00</span>Start</a></li>
+        <li><a href="#projekte"><span class="nav-index" aria-hidden="true">01</span>Projekte</a></li>
+        <li><a href="#ueber-mich"><span class="nav-index" aria-hidden="true">02</span>Über mich</a></li>
+        <li><a href="#kontakt"><span class="nav-index" aria-hidden="true">03</span>Kontakt</a></li>
       </ul>
     </nav>
   </header>
 
   <main>
     <section id="start" aria-labelledby="start-titel">
-      <h1 id="start-titel">Portfolio</h1>
-      <!-- Platzhalter für den späteren, rein dekorativen Canvas-Effekt. -->
-      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <h1 id="start-titel" class="visually-hidden">benizubi – Foto, Video, Web und Social</h1>
+      <canvas id="hero-canvas" role="button" tabindex="0" aria-label="Interaktiver benizubi-Schriftzug. Partikelimpuls auslösen."></canvas>
     </section>
 
-    <section id="projekte" aria-labelledby="projekte-titel">
-      <h2 id="projekte-titel">Projekte</h2>
-      <!-- Hier werden später die Projektkarten eingefügt. -->
-      <div id="projektliste"></div>
+    <section id="projekte" class="portfolio-section" aria-labelledby="projekte-titel">
+      <div class="section-register"><span aria-hidden="true">01 /</span><span>Auswahl</span></div>
+      <div class="section-body">
+        <div class="section-heading">
+          <h2 id="projekte-titel">Projekte<span class="title-stop" aria-hidden="true">.</span></h2>
+          <span class="direction" aria-hidden="true">↙</span>
+        </div>
+        <!-- Projektinhalte folgen später aus WordPress. Keine Dummy-Projekte. -->
+        <div id="projektliste"></div>
+        <ul class="disciplines" aria-label="Arbeitsbereiche">
+          <li>Foto</li><li>Video</li><li>Web</li><li>Social</li>
+        </ul>
+      </div>
     </section>
 
-    <section id="ueber-mich" aria-labelledby="ueber-mich-titel">
-      <h2 id="ueber-mich-titel">Über mich</h2>
-      <!-- Platz für Text und Bild. -->
+    <section id="ueber-mich" class="portfolio-section" aria-labelledby="ueber-mich-titel">
+      <div class="section-register"><span aria-hidden="true">02 /</span><span>Person</span></div>
+      <div class="section-body about-body">
+        <h2 id="ueber-mich-titel">Über<br><span class="offset-word">mich<span class="title-stop" aria-hidden="true">.</span></span></h2>
+        <div class="about-content"><!-- Hier folgen dein Text und gegebenenfalls ein Bild. --></div>
+      </div>
     </section>
 
-    <section id="kontakt" aria-labelledby="kontakt-titel">
-      <h2 id="kontakt-titel">Kontakt</h2>
-      <!-- Platz für Kontaktinformationen. -->
+    <section id="kontakt" class="portfolio-section" aria-labelledby="kontakt-titel">
+      <div class="section-register"><span aria-hidden="true">03 /</span><span>Verbindung</span></div>
+      <div class="section-body">
+        <div class="section-heading">
+          <h2 id="kontakt-titel">Kontakt<span class="title-stop" aria-hidden="true">.</span></h2>
+          <span class="direction" aria-hidden="true">↗</span>
+        </div>
+        <div class="contact-content"><!-- Hier folgen deine Kontaktinformationen. --></div>
+      </div>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <span>benizubi / Portfolio</span>
+    <a href="#start">Zurück nach oben <span aria-hidden="true">↑</span></a>
+  </footer>
 </body>
 </html>
