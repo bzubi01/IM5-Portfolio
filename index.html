@@ -1,1 +1,47 @@
-Hallo Test Portfolio
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <header>
+    <!-- Die schmale Darstellung der Navbar folgt mit der Gestaltung. -->
+    <nav aria-label="Hauptnavigation">
+      <ul>
+        <li><a href="#start">Start</a></li>
+        <li><a href="#projekte">Projekte</a></li>
+        <li><a href="#ueber-mich">Über mich</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="start" aria-labelledby="start-titel">
+      <h1 id="start-titel">Portfolio</h1>
+      <!-- Platzhalter für den späteren, rein dekorativen Canvas-Effekt. -->
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+    </section>
+
+    <section id="projekte" aria-labelledby="projekte-titel">
+      <h2 id="projekte-titel">Projekte</h2>
+      <!-- Hier werden später die Projektkarten eingefügt. -->
+      <div id="projektliste"></div>
+    </section>
+
+    <section id="ueber-mich" aria-labelledby="ueber-mich-titel">
+      <h2 id="ueber-mich-titel">Über mich</h2>
+      <!-- Platz für Text und Bild. -->
+    </section>
+
+    <section id="kontakt" aria-labelledby="kontakt-titel">
+      <h2 id="kontakt-titel">Kontakt</h2>
+      <!-- Platz für Kontaktinformationen. -->
+    </section>
+  </main>
+</body>
+</html>
