@@ -1,6 +1,6 @@
 /**
  * benizubi – Kinetic Sports Type
- * Portfolio hero. No external dependencies; no demo controls.
+ * Portfolio hero. GSAP + ScrollTrigger control the word morph; Canvas handles the physics.
  * Based on the original interactive prototype; styles adjusted to brand blue #003053.
  * Edit WORDS and CONFIG to customise.
  */
@@ -14,22 +14,27 @@
   const cv = root.querySelector('canvas');
   const c = cv.getContext('2d');
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let progress = 0, elapsed = 0, inView = true;
+  const scrollState = { word: 0 };
+  let inView = true;
+  let scrollMedia = null;
+  let accessibleWord = -1;
 
 
   if (!c) return;
   const backdrop = document.createElement('canvas');
   const bg = backdrop.getContext('2d');
 
-  const WORDS = ['benizubi', 'FOTO', 'VIDEO', 'WEB', 'SOCIAL'];
+  const WORDS = ['benizubi', 'FOTOGRAFIE', 'FILM & MOTION', 'DIGITAL', 'DESIGN'];
   const CONFIG = {
     brand: '#003053',
     background: '#f7f9fb',
     radius: 125,
     energy: 1.5,
     trails: 0.65,
-    wordHold: 3600,
-    wordTransition: 1400,
+    scrollPerWord: 0.75, // Viewport heights per transition.
+    scrollHold: 0.35,
+    scrollMorph: 0.65,
+    scrollScrub: 0.3,
     spring: 0.035,
     damping: 0.88,
     maxParticles: 2400,
@@ -84,10 +89,16 @@
     randseed = 31;
     shapes = WORDS.map(shape);
     const n = Math.min(CONFIG.maxParticles, Math.max(...shapes.map(s => s.length)));
-    elapsed = 0; progress = 0;
+
     parts = [];
     for (let i = 0; i < n; i++) {
-      const s = shapes[0][Math.min(shapes[0].length - 1, Math.floor(i * shapes[0].length / n))];
+      const k = Math.min(WORDS.length - 1, Math.floor(scrollState.word));
+      const k2 = Math.min(WORDS.length - 1, k + 1);
+      const sample = (index) => shapes[index][Math.min(shapes[index].length - 1, Math.floor(i * shapes[index].length / n))];
+      const a = sample(k), b = sample(k2);
+      const u = scrollState.word - k;
+      const eased = u * u * (3 - 2 * u);
+      const s = { x: mix(a.x, b.x, eased), y: mix(a.y, b.y, eased) };
       const p = coords(s);
       const v = rand();
       parts.push({ x: p[0], y: p[1], vx: 0, vy: 0, r: (v < 0.08 ? 2 : 1 + rand() * 0.6) * Math.min(1, W / 800), mx: 0, my: 0, hue: rand() });
@@ -105,7 +116,7 @@
   }
   box.addEventListener('pointermove', pointer);
   box.addEventListener('pointerleave', () => { mouse.active = false; mouse.x = -9999; mouse.y = -9999; });
-  // Use native page scrolling. Words change automatically after a readable pause.
+  // The click impulse is independent of scroll-driven word changes.
   function burst() {
     if (motion.matches) return;
     const cx = W * 0.5, cy = H * 0.5;
@@ -173,14 +184,9 @@
   function frame(t) {
     const dt = Math.min((t - prev) / 16.67 || 1, 2); prev = t;
     background();
-    elapsed += dt * 16.67;
-    const cycle = CONFIG.wordHold + CONFIG.wordTransition;
-    const phase = elapsed % cycle;
-    progress = (Math.floor(elapsed / cycle) % WORDS.length)
-      + clamp((phase - CONFIG.wordHold) / CONFIG.wordTransition, 0, 1);
-    const v = progress;
+    const v = scrollState.word;
     const k = Math.min(WORDS.length - 1, Math.floor(v));
-    const k2 = (k + 1) % WORDS.length;
+    const k2 = Math.min(WORDS.length - 1, k + 1);
     let u = v - k; u = u * u * (3 - 2 * u);
     const strength = CONFIG.energy, tail = CONFIG.trails;
     c.lineCap = 'round';
@@ -220,6 +226,51 @@
     rafId = requestAnimationFrame(frame);
   }
 
+  function updateAccessibleWord() {
+    const index = Math.min(WORDS.length - 1, Math.round(scrollState.word));
+    if (index === accessibleWord) return;
+    accessibleWord = index;
+    cv.setAttribute('aria-label', `Partikelschrift: ${WORDS[index]}. Partikelimpuls auslösen.`);
+  }
+
+  function setupScroll() {
+    const { gsap, ScrollTrigger } = window;
+    // If the CDN is unavailable, keep a usable hero without a long empty pin area.
+    if (!gsap || !ScrollTrigger) return;
+    gsap.registerPlugin(ScrollTrigger);
+    scrollMedia = gsap.matchMedia();
+    scrollMedia.add('(prefers-reduced-motion: no-preference)', () => {
+      root.classList.add('is-scroll-driven');
+      resize();
+      const timeline = gsap.timeline({
+        defaults: { ease: 'none' },
+        onUpdate: updateAccessibleWord,
+        scrollTrigger: {
+          id: 'hero-word-scroll',
+          trigger: root,
+          start: 'top top',
+          end: () => `+=${(WORDS.length - 1) * clamp(window.innerHeight * CONFIG.scrollPerWord, 360, 680)}`,
+          pin: true,
+          pinSpacing: true,
+          scrub: CONFIG.scrollScrub,
+          anticipatePin: 1
+        }
+      });
+      // These durations describe scroll proportions, not automatic playback time.
+      timeline.to({}, { duration: CONFIG.scrollHold });
+      for (let i = 1; i < WORDS.length; i++) {
+        timeline.to(scrollState, { word: i, duration: CONFIG.scrollMorph });
+        timeline.to({}, { duration: CONFIG.scrollHold });
+      }
+      updateAccessibleWord();
+      return () => {
+        root.classList.remove('is-scroll-driven');
+        scrollState.word = 0;
+        resize();
+        updateAccessibleWord();
+      };
+    });
+  }
   function stop() { cancelAnimationFrame(rafId); rafId = 0; }
   function start() {
     stop(); prev = 0;
@@ -232,11 +283,18 @@
   });
   ro.observe(box);
   visibility.observe(box);
-  resize(); start();
+  resize(); setupScroll(); updateAccessibleWord(); start();
   document.addEventListener('visibilitychange', start);
   motion.addEventListener('change', () => { resize(); start(); });
-  window.addEventListener('pagehide', () => { stop(); ro.disconnect(); visibility.disconnect(); });
+  window.addEventListener('pagehide', (event) => {
+    stop(); ro.disconnect(); visibility.disconnect();
+    if (!event.persisted) scrollMedia?.revert();
+  });
   window.addEventListener('pageshow', (event) => {
-    if (event.persisted) { ro.observe(box); visibility.observe(box); resize(); start(); }
+    if (event.persisted) {
+      ro.observe(box); visibility.observe(box);
+      window.ScrollTrigger?.refresh();
+      resize(); start();
+    }
   });
 })();

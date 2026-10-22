@@ -357,3 +357,7 @@ h2 {
         transition: none;
     }
 }
+/* Only enhanced after GSAP is available. ScrollTrigger supplies the pin spacing. */
+#start.is-scroll-driven {
+    height: 100svh;
+}
